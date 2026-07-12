@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Calendrier from "./pages/Calendrier";
 import Ajouter from "./pages/Ajouter";
 import CreateScrim from "./pages/CreateScrim";
+import ScrimDetails from "./pages/ScrimDetails";
 import Roster from "./pages/Roster";
 import Plus from "./pages/Plus";
 import Admin from "./pages/Admin";
@@ -19,11 +20,16 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Application */}
+        {/* Dashboard */}
         <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* Scrims */}
+        <Route path="/create-scrim" element={<CreateScrim />} />
+        <Route path="/scrim/:id" element={<ScrimDetails />} />
+
+        {/* Pages */}
         <Route path="/calendrier" element={<Calendrier />} />
         <Route path="/ajouter" element={<Ajouter />} />
-        <Route path="/create-scrim" element={<CreateScrim />} />
         <Route path="/roster" element={<Roster />} />
         <Route path="/plus" element={<Plus />} />
         <Route path="/admin" element={<Admin />} />

@@ -1,5 +1,9 @@
 {
   "appId": "com.dyno.manager",
   "appName": "DYNO",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "url": "http://192.168.1.35:5173",
+    "cleartext": true
+  }
 }

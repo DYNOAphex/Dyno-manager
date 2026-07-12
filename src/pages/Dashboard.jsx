@@ -52,16 +52,18 @@ function Dashboard() {
 
       (snapshot) => {
 
-        console.log("Nombre de scrims :", snapshot.size);
-
         if (snapshot.empty) {
+
           setScrim(null);
           return;
+
         }
 
         const liste = snapshot.docs.map((doc) => ({
+
           id: doc.id,
           ...doc.data(),
+
         }));
 
         liste.sort((a, b) => a.date.localeCompare(b.date));
@@ -72,7 +74,7 @@ function Dashboard() {
 
       (error) => {
 
-        console.error(error);
+        console.log(error);
 
       }
 
@@ -100,7 +102,21 @@ function Dashboard() {
 
       </header>
 
-      <section className="scrim-card">
+      <section
+        className="scrim-card"
+        onClick={() => {
+
+          if (scrim) {
+
+            navigate(`/scrim/${scrim.id}`);
+
+          }
+
+        }}
+        style={{
+          cursor: scrim ? "pointer" : "default",
+        }}
+      >
 
         {scrim ? (
 
@@ -114,19 +130,19 @@ function Dashboard() {
 
             </div>
 
-            <p><strong>📅</strong> {scrim.date}</p>
+            <p>📅 {scrim.date}</p>
 
-            <p><strong>🕒</strong> {scrim.heure1}</p>
+            <p>🕒 {scrim.heure1}</p>
 
             {scrim.heure2 && (
 
-              <p><strong>🕒</strong> {scrim.heure2}</p>
+              <p>🕒 {scrim.heure2}</p>
 
             )}
 
-            <p><strong>⚔️</strong> {scrim.adversaire}</p>
+            <p>⚔️ {scrim.adversaire}</p>
 
-            <p><strong>🏟️</strong> {scrim.arene}</p>
+            <p>🏟️ {scrim.arene}</p>
 
             {scrim.description && (
 
@@ -148,9 +164,7 @@ function Dashboard() {
 
             </div>
 
-            <p>
-              Créez votre première session.
-            </p>
+            <p>Créez votre première session.</p>
 
           </>
 
@@ -158,9 +172,17 @@ function Dashboard() {
 
         <button
           className="gold-btn"
-          onClick={() => navigate("/create-scrim")}
+          onClick={(e) => {
+
+            e.stopPropagation();
+
+            navigate("/create-scrim");
+
+          }}
         >
+
           + Créer une session
+
         </button>
 
       </section>
@@ -168,27 +190,43 @@ function Dashboard() {
       <section className="stats-grid">
 
         <div className="stat-card">
+
           <span className="stat-emoji">👥</span>
+
           <h3>0</h3>
+
           <p>Joueurs</p>
+
         </div>
 
         <div className="stat-card">
+
           <span className="stat-emoji">✅</span>
+
           <h3>0</h3>
+
           <p>Présents</p>
+
         </div>
 
         <div className="stat-card">
+
           <span className="stat-emoji">🎮</span>
+
           <h3>{scrim ? 1 : 0}</h3>
+
           <p>Sessions</p>
+
         </div>
 
         <div className="stat-card">
+
           <span className="stat-emoji">📈</span>
+
           <h3>0%</h3>
+
           <p>Winrate</p>
+
         </div>
 
       </section>

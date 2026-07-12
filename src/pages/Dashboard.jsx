@@ -7,9 +7,6 @@ import {
   doc,
   getDoc,
   collection,
-  query,
-  orderBy,
-  limit,
   onSnapshot,
 } from "firebase/firestore";
 
@@ -43,21 +40,31 @@ function Dashboard() {
 
     loadUser();
 
-    const q = query(
+    const unsubscribe = onSnapshot(
       collection(db, "scrims"),
-      orderBy("date"),
-      limit(1)
-    );
+      (snapshot) => {
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (!snapshot.empty) {
 
-      if (!snapshot.empty) {
-        setScrim(snapshot.docs[0].data());
-      } else {
-        setScrim(null);
+          const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          data.sort((a, b) =>
+            a.date.localeCompare(b.date)
+          );
+
+          setScrim(data[0]);
+
+        } else {
+
+          setScrim(null);
+
+        }
+
       }
-
-    });
+    );
 
     return () => unsubscribe();
 
@@ -95,17 +102,25 @@ function Dashboard() {
 
             </div>
 
-            <p><strong>📅</strong> {scrim.date}</p>
+            <p>📅 {scrim.date}</p>
 
-            <p><strong>🕒</strong> {scrim.time}</p>
+            <p>🕒 {scrim.heure1}</p>
 
-            {scrim.time2 && (
-              <p><strong>🕒 2</strong> {scrim.time2}</p>
+            {scrim.heure2 && (
+
+              <p>🕒 {scrim.heure2}</p>
+
             )}
 
-            <p><strong>🏟️</strong> {scrim.arena}</p>
+            <p>🏟️ {scrim.arene}</p>
 
-            <p><strong>⚔️</strong> {scrim.opponent}</p>
+            <p>⚔️ {scrim.adversaire}</p>
+
+            {scrim.description && (
+
+              <p>{scrim.description}</p>
+
+            )}
 
           </>
 
@@ -117,7 +132,7 @@ function Dashboard() {
 
               <span className="emoji">📅</span>
 
-              <h2>Aucun scrim prévu</h2>
+              <h2>Aucune session prévue</h2>
 
             </div>
 
@@ -133,7 +148,7 @@ function Dashboard() {
           className="gold-btn"
           onClick={() => navigate("/create-scrim")}
         >
-          + Créer un scrim
+          + Créer une session
         </button>
 
       </section>
@@ -153,9 +168,9 @@ function Dashboard() {
         </div>
 
         <div className="stat-card">
-          <span className="stat-emoji">🏆</span>
+          <span className="stat-emoji">🎮</span>
           <h3>{scrim ? 1 : 0}</h3>
-          <p>Matchs</p>
+          <p>Sessions</p>
         </div>
 
         <div className="stat-card">

@@ -46,7 +46,7 @@ function CreateScrim() {
 
       });
 
-      alert("Scrim créé avec succès.");
+      alert("Session créée avec succès.");
 
       navigate("/dashboard");
 

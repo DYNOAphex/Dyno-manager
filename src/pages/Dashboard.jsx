@@ -41,32 +41,37 @@ function Dashboard() {
     loadUser();
 
     const unsubscribe = onSnapshot(
-      collection(db, "scrims"),
-      (snapshot) => {
+  collection(db, "scrims"),
+  (snapshot) => {
 
-        if (!snapshot.empty) {
+    console.log("Nombre de scrims :", snapshot.size);
 
-          const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+    snapshot.forEach((doc) => {
+      console.log(doc.id, doc.data());
+    });
 
-          data.sort((a, b) =>
-            a.date.localeCompare(b.date)
-          );
+    if (!snapshot.empty) {
 
-          setScrim(data[0]);
+      const premierScrim = {
+        id: snapshot.docs[0].id,
+        ...snapshot.docs[0].data(),
+      };
 
-        } else {
+      console.log("Premier scrim :", premierScrim);
 
-          setScrim(null);
+      setScrim(premierScrim);
 
-        }
+    } else {
 
-      }
-    );
+      setScrim(null);
 
-    return () => unsubscribe();
+    }
+
+  },
+  (error) => {
+    console.error("Erreur Firestore :", error);
+  }
+);
 
   }, []);
 

@@ -1,71 +1,96 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { auth, db } from "../firebase";
 
 import {
   doc,
-  getDoc,
+  onSnapshot,
   updateDoc,
 } from "firebase/firestore";
+
+import "../styles/dashboard.css";
 
 function ScrimDetails() {
 
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [scrim, setScrim] = useState(null);
 
   useEffect(() => {
 
-    loadScrim();
+    const unsubscribe = onSnapshot(
 
-  }, []);
+      doc(db, "scrims", id),
 
-  const loadScrim = async () => {
+      (snapshot) => {
 
-    const snap = await getDoc(doc(db, "scrims", id));
+        if (snapshot.exists()) {
 
-    if (snap.exists()) {
+          setScrim({
 
-      setScrim({
-        id: snap.id,
-        ...snap.data(),
+            id: snapshot.id,
+            ...snapshot.data(),
+
+          });
+
+        }
+
+      },
+
+      (error) => {
+
+        console.error(error);
+
+      }
+
+    );
+
+    return () => unsubscribe();
+
+  }, [id]);
+
+  const repondre = async (etat) => {
+
+    if (!auth.currentUser) return;
+
+    try {
+
+      await updateDoc(doc(db, "scrims", id), {
+
+        [`participants.${auth.currentUser.uid}`]: etat,
+
       });
+
+    } catch (e) {
+
+      console.error(e);
+
+      alert("Erreur lors de l'enregistrement.");
 
     }
 
   };
 
-  const repondre = async (etat) => {
+  if (!scrim) {
 
-    const user = auth.currentUser;
+    return <h2 style={{ color: "white" }}>Chargement...</h2>;
 
-    if (!user) return;
-
-    await updateDoc(doc(db, "scrims", id), {
-
-      [`participants.${user.uid}`]: etat,
-
-    });
-
-    loadScrim();
-
-  };
-
-  if (!scrim) return <h2>Chargement...</h2>;
+  }
 
   const participants = scrim.participants || {};
 
   const presents = Object.values(participants).filter(
-    p => p === "present"
+    (v) => v === "present"
   ).length;
 
   const absents = Object.values(participants).filter(
-    p => p === "absent"
+    (v) => v === "absent"
   ).length;
 
   const attente = Object.values(participants).filter(
-    p => p === "attente"
+    (v) => v === "attente"
   ).length;
 
   return (
@@ -78,15 +103,21 @@ function ScrimDetails() {
 
       <p>🕒 {scrim.heure1}</p>
 
+      {scrim.heure2 && <p>🕒 {scrim.heure2}</p>}
+
       <p>⚔️ {scrim.adversaire}</p>
+
+      <p>🏟️ {scrim.arene}</p>
 
       <hr />
 
-      <h3>🟢 Présents : {presents}</h3>
+      <h2>Participants</h2>
 
-      <h3>🟡 En attente : {attente}</h3>
+      <p>🟢 Présents : {presents}</p>
 
-      <h3>🔴 Absents : {absents}</h3>
+      <p>🟡 En attente : {attente}</p>
+
+      <p>🔴 Absents : {absents}</p>
 
       <button
         className="gold-btn"
@@ -107,6 +138,13 @@ function ScrimDetails() {
         onClick={() => repondre("absent")}
       >
         ❌ Je suis absent
+      </button>
+
+      <button
+        className="gold-btn"
+        onClick={() => navigate("/dashboard")}
+      >
+        ⬅ Retour
       </button>
 
     </div>

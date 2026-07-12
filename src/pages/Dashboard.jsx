@@ -19,21 +19,27 @@ function Dashboard() {
 
   const navigate = useNavigate();
 
-  const [pseudo, setPseudo] = useState("");
+  const [pseudo, setPseudo] = useState("Joueur");
   const [scrim, setScrim] = useState(null);
 
   useEffect(() => {
 
     const loadUser = async () => {
 
-      const user = auth.currentUser;
+      if (!auth.currentUser) return;
 
-      if (!user) return;
+      try {
 
-      const snap = await getDoc(doc(db, "users", user.uid));
+        const snap = await getDoc(
+          doc(db, "users", auth.currentUser.uid)
+        );
 
-      if (snap.exists()) {
-        setPseudo(snap.data().pseudo);
+        if (snap.exists()) {
+          setPseudo(snap.data().pseudo);
+        }
+
+      } catch (err) {
+        console.log(err);
       }
 
     };
@@ -41,37 +47,38 @@ function Dashboard() {
     loadUser();
 
     const unsubscribe = onSnapshot(
-  collection(db, "scrims"),
-  (snapshot) => {
 
-    console.log("Nombre de scrims :", snapshot.size);
+      collection(db, "scrims"),
 
-    snapshot.forEach((doc) => {
-      console.log(doc.id, doc.data());
-    });
+      (snapshot) => {
 
-    if (!snapshot.empty) {
+        console.log("Nombre de scrims :", snapshot.size);
 
-      const premierScrim = {
-        id: snapshot.docs[0].id,
-        ...snapshot.docs[0].data(),
-      };
+        if (snapshot.empty) {
+          setScrim(null);
+          return;
+        }
 
-      console.log("Premier scrim :", premierScrim);
+        const liste = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-      setScrim(premierScrim);
+        liste.sort((a, b) => a.date.localeCompare(b.date));
 
-    } else {
+        setScrim(liste[0]);
 
-      setScrim(null);
+      },
 
-    }
+      (error) => {
 
-  },
-  (error) => {
-    console.error("Erreur Firestore :", error);
-  }
-);
+        console.error(error);
+
+      }
+
+    );
+
+    return () => unsubscribe();
 
   }, []);
 
@@ -87,7 +94,7 @@ function Dashboard() {
           className="dashboard-logo"
         />
 
-        <h1>Bonjour {pseudo || "Joueur"} 👋</h1>
+        <h1>Bonjour {pseudo} 👋</h1>
 
         <p>Bienvenue sur DYNO Manager</p>
 
@@ -107,19 +114,19 @@ function Dashboard() {
 
             </div>
 
-            <p>📅 {scrim.date}</p>
+            <p><strong>📅</strong> {scrim.date}</p>
 
-            <p>🕒 {scrim.heure1}</p>
+            <p><strong>🕒</strong> {scrim.heure1}</p>
 
             {scrim.heure2 && (
 
-              <p>🕒 {scrim.heure2}</p>
+              <p><strong>🕒</strong> {scrim.heure2}</p>
 
             )}
 
-            <p>🏟️ {scrim.arene}</p>
+            <p><strong>⚔️</strong> {scrim.adversaire}</p>
 
-            <p>⚔️ {scrim.adversaire}</p>
+            <p><strong>🏟️</strong> {scrim.arene}</p>
 
             {scrim.description && (
 
@@ -142,7 +149,7 @@ function Dashboard() {
             </div>
 
             <p>
-              Organisez votre prochain entraînement.
+              Créez votre première session.
             </p>
 
           </>

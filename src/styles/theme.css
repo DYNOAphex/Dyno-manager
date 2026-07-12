@@ -1,0 +1,65 @@
+/* ===========================
+   DASHBOARD
+=========================== */
+
+.dashboard{
+
+    min-height:100vh;
+
+    background:url("../assets/background.png");
+
+    background-size:cover;
+
+    background-position:center;
+
+    padding:25px 20px 120px;
+
+}
+
+.empty-card{
+
+    margin-top:30px;
+
+    text-align:center;
+
+}
+
+.empty-icon{
+
+    font-size:60px;
+
+    margin-bottom:15px;
+
+}
+
+.empty-card h2{
+
+    color:#D4AF37;
+
+    font-size:34px;
+
+    margin-bottom:12px;
+
+}
+
+.empty-card p{
+
+    color:#ddd;
+
+    margin-bottom:25px;
+
+    line-height:1.6;
+
+}
+
+.stats{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+    margin-top:25px;
+
+}

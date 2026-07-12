@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+
+import {
+  doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+} from "firebase/firestore";
 
 import "../styles/dashboard.css";
 
@@ -14,6 +23,7 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [pseudo, setPseudo] = useState("");
+  const [scrim, setScrim] = useState(null);
 
   useEffect(() => {
 
@@ -23,9 +33,7 @@ function Dashboard() {
 
       if (!user) return;
 
-      const snap = await getDoc(
-        doc(db, "users", user.uid)
-      );
+      const snap = await getDoc(doc(db, "users", user.uid));
 
       if (snap.exists()) {
         setPseudo(snap.data().pseudo);
@@ -34,6 +42,24 @@ function Dashboard() {
     };
 
     loadUser();
+
+    const q = query(
+      collection(db, "scrims"),
+      orderBy("date"),
+      limit(1)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+
+      if (!snapshot.empty) {
+        setScrim(snapshot.docs[0].data());
+      } else {
+        setScrim(null);
+      }
+
+    });
+
+    return () => unsubscribe();
 
   }, []);
 
@@ -57,17 +83,51 @@ function Dashboard() {
 
       <section className="scrim-card">
 
-        <div className="scrim-top">
+        {scrim ? (
 
-          <span className="emoji">📅</span>
+          <>
 
-          <h2>Aucun scrim prévu</h2>
+            <div className="scrim-top">
 
-        </div>
+              <span className="emoji">🎮</span>
 
-        <p>
-          Organisez votre prochain entraînement.
-        </p>
+              <h2>{scrim.type}</h2>
+
+            </div>
+
+            <p><strong>📅</strong> {scrim.date}</p>
+
+            <p><strong>🕒</strong> {scrim.time}</p>
+
+            {scrim.time2 && (
+              <p><strong>🕒 2</strong> {scrim.time2}</p>
+            )}
+
+            <p><strong>🏟️</strong> {scrim.arena}</p>
+
+            <p><strong>⚔️</strong> {scrim.opponent}</p>
+
+          </>
+
+        ) : (
+
+          <>
+
+            <div className="scrim-top">
+
+              <span className="emoji">📅</span>
+
+              <h2>Aucun scrim prévu</h2>
+
+            </div>
+
+            <p>
+              Organisez votre prochain entraînement.
+            </p>
+
+          </>
+
+        )}
 
         <button
           className="gold-btn"
@@ -94,7 +154,7 @@ function Dashboard() {
 
         <div className="stat-card">
           <span className="stat-emoji">🏆</span>
-          <h3>0</h3>
+          <h3>{scrim ? 1 : 0}</h3>
           <p>Matchs</p>
         </div>
 
@@ -127,6 +187,7 @@ function Dashboard() {
     </div>
 
   );
+
 }
 
 export default Dashboard;

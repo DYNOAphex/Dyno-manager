@@ -34,17 +34,16 @@ function CreateScrim() {
     try {
 
       await addDoc(collection(db, "scrims"), {
-
-        type,
-        date,
-        heure1,
-        heure2,
-        adversaire,
-        arene,
-        description,
-        createdAt: serverTimestamp(),
-
-      });
+  type,
+  date,
+  heure1,
+  heure2,
+  adversaire,
+  arene,
+  description,
+  participants: {},
+  createdAt: serverTimestamp(),
+});
 
       alert("Session créée avec succès.");
 

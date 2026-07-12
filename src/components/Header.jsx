@@ -1,24 +1,40 @@
+import "./Header.css";
 import logo from "../assets/logo.png";
+import { Bell } from "lucide-react";
 
-function Header() {
+function Header({ pseudo }) {
   return (
-    <div className="header">
+    <header className="header">
 
-      <img
-        src={logo}
-        alt="DYNO"
-        className="logo"
-      />
+      <div className="header-left">
 
-      <h1 className="title">
-        DYNO
-      </h1>
+        <img
+          src={logo}
+          alt="DYNO"
+          className="header-logo"
+        />
 
-      <p className="subtitle">
-        Esport Manager
-      </p>
+        <div>
 
-    </div>
+          <h2 className="header-title">
+            Bonjour, {pseudo}
+          </h2>
+
+          <p className="header-subtitle">
+            Bon retour sur DYNO
+          </p>
+
+        </div>
+
+      </div>
+
+      <button className="notif-button">
+
+        <Bell size={22} />
+
+      </button>
+
+    </header>
   );
 }
 
